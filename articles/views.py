@@ -4,6 +4,7 @@ from rest_framework import status, permissions
 from rest_framework.response import Response
 from articles.models import Article, Comment
 from articles.serializers import ArticleListSerializer, ArticleSerializer, ArticleCreateSerializer, CommentSerializer, CommentCreateSerializer
+from django.db.models import Q
 
 
 
@@ -20,6 +21,23 @@ class ArticleView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FeedView(APIView):
+    permission_class = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        q = Q()
+        for user in request.user.followings.all(): #요청한 user의 following 글을 모두 가져옴
+            q.add(Q(user=user),q.OR) #or조건으로 들어가게
+        feeds = Article.objects.filter(q)
+        serializer = ArticleListSerializer(feeds, many=True)
+        return Response(serializer.data)
+
+
+
+
+
 
 class ArticleDetailView(APIView):
     def get(self, request, article_id):
