@@ -10,4 +10,5 @@ urlpatterns = [
     path('mock/', views.mockView.as_view(), name = 'mock'),
     path('api/token/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'), #토큰 지급, login
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), #토큰연장
+    path('follow/<int:user_id>/', views.FollowView.as_view(), name="follow_view")
 ]
